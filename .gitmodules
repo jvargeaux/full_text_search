@@ -1,0 +1,6 @@
+[submodule "lib/groonga"]
+	path = lib/groonga
+	url = https://github.com/groonga/groonga.git
+[submodule "lib/mecab"]
+	path = lib/mecab
+	url = https://github.com/taku910/mecab.git
