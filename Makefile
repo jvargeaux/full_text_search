@@ -11,7 +11,7 @@ SOURCE_DIR := src
 CPP_HEADERS := $(wildcard $(SOURCE_DIR)/*.hpp)
 CPP_SOURCES := $(wildcard $(SOURCE_DIR)/*.cpp)
 
-COMPILE_FLAGS := -arch arm64
+# COMPILE_FLAGS := -arch arm64
 
 CPP_OBJECTS := $(patsubst $(SOURCE_DIR)/%, $(OBJECT_DIR)/%, ${CPP_SOURCES:.cpp=.o})
 
@@ -21,12 +21,12 @@ graph: $(BIN_DIR)/generate_graph
 
 # Main: object -> binary
 $(BIN_DIR)/$(APP): $(CPP_OBJECTS)
-	mkdir -p $(BIN_DIR)
+	@mkdir -p $(BIN_DIR)
 	$(CC) $(CPP_OBJECTS) -o $@
 
 # Main: source -> object
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(CPP_HEADERS)
-	mkdir -p $(OBJECT_DIR)
+	@mkdir -p $(OBJECT_DIR)
 	$(CC) -c $(COMPILE_FLAGS) $< -o $@
 
 # # Generate graph: object -> binary
