@@ -2,6 +2,7 @@
 #define SUFFIX_TREE_H
 
 
+#include <string>
 #include <vector>
 using namespace std;
 

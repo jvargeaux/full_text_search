@@ -1,6 +1,5 @@
 #! /bin/bash
 
-# root_dir=~/Dev/Professional/Ayo/full_text_search
 root_dir=$(realpath `dirname $0`/..)
 
 
