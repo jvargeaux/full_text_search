@@ -4,21 +4,32 @@
 using namespace std;
 
 
-void print_tree(string str, Node *node, ofstream *fout) {
+size_t id;
+
+
+void print_node_labels(string str, Node *node, ofstream *fout) {
+	if (node->label_length) id++;
+	string node_label = str.substr(node->label_offset, node->label_length);
+	*fout << '\t' << (node->label_length ? id : 0) << " [label=\"" << (node->label_length ? node_label : "root") << "\"]" << '\n';
 	if (node->children.empty()) {
 		return;
 	}
-	string node_label = str.substr(node->label_offset, node->label_length);
 	for (int i = 0; i < node->children.size(); i++) {
+		print_node_labels(str, node->children[i], fout);
+	}
+}
+
+
+void print_connections(string str, Node *node, ofstream *fout) {
+	if (node->children.empty()) {
+		return;
+	}
+	size_t current_id = id;
+	for (int i = 0; i < node->children.size(); i++) {
+		id++;
 		string child_label = str.substr(node->children[i]->label_offset, node->children[i]->label_length);
-		// No label = root
-		if (!node_label.length()) {
-			*fout << '\t' << "root" << " -> " << child_label << '\n';
-		}
-		else {
-			*fout << '\t' << node_label << " -> " << child_label << '\n';
-		}
-		print_tree(str, node->children[i], fout);
+		*fout << '\t' << (node->label_length ? current_id : 0) << " -> " << id << '\n';
+		print_connections(str, node->children[i], fout);
 	}
 }
 
@@ -28,7 +39,10 @@ int generate_graph(string str, Node *root) {
 	ofstream fout(filename);
 
 	fout << "digraph {\n";
-	print_tree(str, root, &fout);
+	id = 0;
+	print_node_labels(str, root, &fout);
+	id = 0;
+	print_connections(str, root, &fout);
 	fout << "}\n";
 	return 0;
 }

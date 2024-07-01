@@ -19,8 +19,6 @@ struct Node {
 };
 
 Node* append_node(Node *node, int label_offset, int label_length);
-// void insert_node(Node *root, Node *node);
-// void build_suffix_trie(string str, Node *root);
 void build_suffix_tree_naive(string str, Node *root, bool debug);
 int walk_down(string str, Node *root);
 
