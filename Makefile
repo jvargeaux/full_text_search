@@ -15,6 +15,10 @@ CPP_SOURCES := $(wildcard $(SOURCE_DIR)/*.cpp)
 
 CPP_OBJECTS := $(patsubst $(SOURCE_DIR)/%, $(OBJECT_DIR)/%, ${CPP_SOURCES:.cpp=.o})
 
+# Make flags
+.PHONY: clean
+.SILENT:
+
 # Default
 all: $(BIN_DIR)/$(APP)
 graph: $(BIN_DIR)/generate_graph

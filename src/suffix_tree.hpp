@@ -7,16 +7,20 @@ using namespace std;
 
 
 struct Node {
-	char character;
-	int index;
+	int label_offset;
+	int label_length;
+	int string_id;
+	int string_offset;
 	vector<Node*> children;
 
-	Node(): character(0), index(0) {}
+	Node(int _label_offset, int _label_length) : label_offset(_label_offset), label_length(_label_length) {}
+	Node(): label_offset(0), label_length(0), string_id(-1), string_offset(0) {}
 };
 
-Node* create_node(char character, int index);
-void insert_node(Node *root, Node *node);
-void build_suffix_tree(string str, Node *root);
+Node* append_node(Node *node, int label_offset, int label_length);
+// void insert_node(Node *root, Node *node);
+// void build_suffix_trie(string str, Node *root);
+void build_suffix_tree_naive(string str, Node *root, bool debug);
 int walk_down(string str, Node *root);
 
 

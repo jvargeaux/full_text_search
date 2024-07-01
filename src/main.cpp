@@ -5,10 +5,9 @@
 
 
 int main() {
-	string str = "abcdef";
+	string str = "aaba$";
 	Node *root = new Node();
-	root->character = '#';
-	build_suffix_tree(str, root);
-	generate_graph(root);
+	build_suffix_tree_naive(str, root, true);
+	generate_graph(str, root);
 	return 0;
 }

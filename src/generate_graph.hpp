@@ -7,8 +7,7 @@
 using namespace std;
 
 
-void print_tree(Node *root, ofstream *fout);
-int generate_graph(Node *root);
+int generate_graph(string str, Node *root);
 
 
 #endif
