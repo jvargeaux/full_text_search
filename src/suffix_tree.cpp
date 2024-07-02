@@ -1,25 +1,27 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "debug.hpp"
 #include "suffix_tree.hpp"
 using namespace std;
 
 
 Node* append_node(Node *parent, int label_offset, int label_length) {
 	Node* new_node = new Node(label_offset, label_length);
+	new_node->string_ids.push_back(tuple<int, int>{label_offset, label_length});
 	parent->children.push_back(new_node);
 	return new_node;
 }
 
 
 Node* split_node(Node *parent_node, int match_index, string original_str, int split_offset) {
-	// 		(original_offset, original_length)
+	//    (original_offset, original_length)
 	// -> (original_offset, parent_length) + (split_offset, child_length)
 	// 
-	// Ex:	split at 4
-	//		(3, 7) -> 10
-	// -> (3, 1) -> 4	 +	(4, 6) -> 10
-	//     new    			 original
+	// Ex: split at 4
+	//    (3, 7) -> 10
+	// -> (3, 1) -> 4   +   (4, 6) -> 10
+	//      new            original
 	// 
 	// Important: original node needs to be end node, to maintain children
 
@@ -27,6 +29,7 @@ Node* split_node(Node *parent_node, int match_index, string original_str, int sp
 
 	int parent_length = split_offset - original_node->label_offset;
 	Node* new_node = new Node(original_node->label_offset, parent_length);
+	new_node->string_ids.push_back(tuple<int, int>{original_node->label_offset, original_node->label_length});
 
 	int child_length = original_node->label_length - parent_length;
 	original_node->label_offset = split_offset;
@@ -41,10 +44,10 @@ Node* split_node(Node *parent_node, int match_index, string original_str, int sp
 
 int matching_prefix_index(Node *node, string original_str, int current_suffix_offset) {
 	// If the first character matches, we have found our match.
-	// Explanation:		There will never be two children who share the same first character,
-	// 								as the shared character will have become its own node
-	// possible:		a, ba$
-	// impossible:	a, aba$
+	// Explanation:   There will never be two children who share the same first character,
+	//                as the shared character will have become its own node
+	// possible:    a, ba$
+	// impossible:  a, aba$
 	for (int i = 0; i < node->children.size(); i++) {
 		string suffix_label = original_str.substr(current_suffix_offset, original_str.length());
 		string node_label = original_str.substr(node->children[i]->label_offset, node->children[i]->label_length);
@@ -55,56 +58,6 @@ int matching_prefix_index(Node *node, string original_str, int current_suffix_of
 		}
 	}
 	return -1;
-}
-
-
-void debug_node_info(Node *current_node, string original_str) {
-	string node_label = original_str.substr(current_node->label_offset, current_node->label_length);
-	if (!node_label.length()) {
-		node_label = "<root>";
-	}
-	cout << "Current node: " << node_label << '\n';
-	cout << "Current node children...\n";
-	for (int c = 0; c < current_node->children.size(); c++) {
-		string child_label = original_str.substr(current_node->children[c]->label_offset, current_node->children[c]->label_length);
-		cout << child_label << '\n';
-	}
-}
-
-
-void debug_match_child_label(string original_str, int current_suffix_offset, int num_shared_chars) {
-	cout << "Num shared chars: " << num_shared_chars << '\n';
-	string suffix_label = original_str.substr(current_suffix_offset, original_str.length());
-	cout << "Remaining suffix: " << suffix_label << '\n';
-}
-
-
-void debug_walk_node(Node *current_node, string original_str) {
-	cout << "Entire label match.\n";
-	string node_label = original_str.substr(current_node->label_offset, current_node->label_length);
-	cout << "Walk down into node " << node_label << '\n';
-}
-
-
-void debug_split_node(Node *current_node, string original_str, int current_suffix_offset, int split_offset) {
-	int parent_length = split_offset - current_node->label_offset;
-	int child_length = current_node->label_length - parent_length;
-	string original_label = original_str.substr(current_node->label_offset, current_node->label_length);
-	string parent_label = original_str.substr(current_node->label_offset, parent_length);
-	string child_label = original_str.substr(split_offset, child_length);
-	cout << "Partial label match.\n";
-	cout << "Split node " << original_label << " into parent " << parent_label << " and child " << child_label << '\n';
-	cout << "Walk down into node " << parent_label << '\n';
-}
-
-
-void debug_append_node(Node *current_node, string original_str, int current_suffix_offset) {
-	string suffix_label = original_str.substr(current_suffix_offset, original_str.length());
-	string node_label = original_str.substr(current_node->label_offset, current_node->label_length);
-	if (!node_label.length()) {
-		node_label = "<root>";
-	}
-	cout << "Append remaining suffix " << suffix_label << " to node " << node_label << '\n';
 }
 
 
@@ -143,6 +96,7 @@ void build_suffix_tree_naive(string original_str, Node *root, bool debug) {
 
 					// Do not walk down to child yet, in case we need to split, which involves rewriting parent's reference to child
 					Node *matched_child_node = current_node->children[match_index];
+					const auto [matched_child_string_id, matched_child_string_offset] = matched_child_node->string_ids[0];
 
 					// Check for matching characters
 					int num_shared_chars = 0;
@@ -152,11 +106,11 @@ void build_suffix_tree_naive(string original_str, Node *root, bool debug) {
 							break;
 						}
 						// Cut off label_length from beginning of suffix
-						// Original:					xyzaba$
-						// Matching label:		ab			<-- length of 2
-						// Suffix:						aba$		<-- offset 3
-						// 										-> Move to the right by 2 (matching label length)
-						// Remaining suffix:	a$			<-- offset 5
+						// Original:          xyzaba$
+						// Matching label:    ab     <-- length of 2
+						// Suffix:            aba$   <-- offset 3
+						//                           -> Move to the right by 2 (matching label length)
+						// Remaining suffix:  a$     <-- offset 5
 						current_suffix_offset++;
 						num_shared_chars++;
 					}
