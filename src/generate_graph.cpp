@@ -10,7 +10,11 @@ size_t id;
 void print_node_labels(string str, Node *node, ofstream *fout) {
 	if (node->label_length) id++;
 	string node_label = str.substr(node->label_offset, node->label_length);
-	*fout << '\t' << (node->label_length ? id : 0) << " [label=\"" << (node->label_length ? node_label : "root") << "\"]" << '\n';
+	*fout << '\t' << (node->label_length ? id : 0)
+	      << " [label=\"" << (node->label_length ? node_label : "root")
+		  << "\n[" << node->label_offset << "," << node->label_length << "]"
+		  << " (" << 0 << "," << node->suffix_offset << ")"
+		  << "\"]\n";
 	if (node->children.empty()) {
 		return;
 	}
@@ -34,8 +38,7 @@ void print_connections(string str, Node *node, ofstream *fout) {
 }
 
 
-int generate_graph(string str, Node *root) {
-	char filename[] = "graph.gv";
+int generate_graph(string str, Node *root, string filename = "graph/graph.gv") {
 	ofstream fout(filename);
 
 	fout << "digraph {\n";

@@ -5,7 +5,8 @@
 #include <iostream>
 #include <string>
 #include "suffix_tree.hpp"
-using namespace std;
+
+constexpr bool debug = false;
 
 
 void debug_node_info(Node *current_node, string original_str);

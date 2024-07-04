@@ -7,7 +7,7 @@
 using namespace std;
 
 
-int generate_graph(string str, Node *root);
+int generate_graph(string str, Node *root, string filename);
 
 
 #endif
