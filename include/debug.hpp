@@ -1,6 +1,4 @@
-#ifndef DEBUG_H
-#define DEBUG_H
-
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -14,6 +12,3 @@ void debug_match_child_label(string original_str, int current_suffix_offset, int
 void debug_walk_node(Node *current_node, string original_str);
 void debug_split_node(Node *current_node, string original_str, int current_suffix_offset, int split_offset);
 void debug_append_node(Node *current_node, string original_str, int current_suffix_offset);
-
-
-#endif

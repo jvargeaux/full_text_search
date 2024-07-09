@@ -8,6 +8,8 @@ if [[ ! -f $root_dir/graph.gv ]]; then
     exit 1
 fi
 
+dot -Tsvg $root_dir/graph.gv > $root_dir/graph/graph.svg
+
 if [[ $1 == "-debug" ]]; then
 	if [[ ! -f $root_dir/graph/debug/svg/ ]]; then
 		mkdir -p $root_dir/graph/debug/svg/

@@ -1,22 +1,29 @@
+#include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include "argparse.hpp"
 #include "generate_graph.hpp"
 #include "suffix_tree.hpp"
 
 
-int main() {
-	string str1 = "greennerdgreen$";
-	Node *root = new Node();
-	build_suffix_tree_naive(str1, root);
-	generate_graph(str1, root, "graph.gv");
+int main(int argc, char **argv) {
+	ArgParser::ArgumentsList arguments = ArgParser::parse_args(argc, const_cast<char**>(argv));
+	arguments.print_all_arguments();
 
-	vector<int> matches {};
-	query_suffix_tree(root, str1, "n", &matches);
+	string tree_str1 = "greennerdgreen$";
+	string query_string = "asfd";
 
-	cout << "\nQuery result: " << '\n';
-	for (int m = 0; m < matches.size(); m++) {
-		cout << matches[m] << '\n';
-	}
-	
+	// Build suffix tree
+	// Node *root = new Node();
+	// build_suffix_tree_naive(tree_str1, root);
+	// generate_graph(tree_str1, root, "graph.gv");
+
+	// Lambda
+	// auto test_fn = []() {}
+
+	// std::cout << arguments.get<std::string>("test") << '\n';
+	// std::cout << arguments.get<std::string>("t") << '\n';
+
 	return 0;
 }

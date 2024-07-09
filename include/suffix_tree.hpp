@@ -1,6 +1,4 @@
-#ifndef SUFFIX_TREE_H
-#define SUFFIX_TREE_H
-
+#pragma once
 
 #include <string>
 #include <vector>
@@ -22,6 +20,3 @@ struct Node {
 Node* append_node(Node *node, int label_offset, int label_length);
 void build_suffix_tree_naive(string str, Node *root);
 void query_suffix_tree(Node *root, string original_str, string query_string, vector<int> *matches);
-
-
-#endif

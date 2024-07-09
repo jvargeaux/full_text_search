@@ -206,7 +206,7 @@ void query_suffix_tree(Node *root, string original_str, string query_string, vec
 
 	while (query_offset < query_string.length()) {
 		int match_index = matching_prefix_index(current_node, original_str, query_string, query_offset);
-		cout << "Match index: " << match_index << '\n';
+		if constexpr(debug) cout << "Match index: " << match_index << '\n';
 
 		// No matching prefix found, fall off the tree
 		if (match_index == -1) {
@@ -216,8 +216,8 @@ void query_suffix_tree(Node *root, string original_str, string query_string, vec
 			Node *matched_child_node = current_node->children[match_index];
 			
 			int num_shared_chars = get_num_shared_chars(matched_child_node, original_str, query_string, &query_offset);
-			cout << "Num shared chars: " << num_shared_chars << '\n';
-			cout << "Query offset: " << query_offset << '\n';
+			if constexpr(debug) cout << "Num shared chars: " << num_shared_chars << '\n';
+			if constexpr(debug) cout << "Query offset: " << query_offset << '\n';
 
 			// query string exhausted, node label not exhausted   -> full query match, return this node
 			// node label exhausted, query string not exhausted   -> full label match, keep searching

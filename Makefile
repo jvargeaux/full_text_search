@@ -7,11 +7,12 @@ OBJECT_DIR := obj
 GRAPH_DIR := graph
 
 # Inputs
+INCLUDE_DIR := include
 SOURCE_DIR := src
-CPP_HEADERS := $(wildcard $(SOURCE_DIR)/*.hpp)
+CPP_HEADERS := $(wildcard $(INCLUDE_DIR)/*.hpp)
 CPP_SOURCES := $(wildcard $(SOURCE_DIR)/*.cpp)
 
-COMPILE_FLAGS := -std=c++17 -Wall -Wunused-parameter -Wunreachable-code -Wextra -Wpedantic -Wconversion
+COMPILE_FLAGS := -std=c++17 -Wall -Wunused-parameter -Wunreachable-code -Wextra -Wpedantic -Wconversion -I $(INCLUDE_DIR)
 CPP_OBJECTS := $(patsubst $(SOURCE_DIR)/%, $(OBJECT_DIR)/%, ${CPP_SOURCES:.cpp=.o})
 
 # Make flags
