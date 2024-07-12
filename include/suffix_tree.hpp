@@ -1,16 +1,16 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <vector>
-using namespace std;
 
 
 struct Node {
-	vector<tuple<int, int>> string_ids;
+	// std::vector<std::tuple<int, int>> string_ids;
 	int label_offset;
 	int label_length;
 	int suffix_offset;
-	vector<Node*> children;
+	std::vector<Node*> children;
 
 	Node(int _label_offset, int _label_length) :
 		label_offset(_label_offset), label_length(_label_length), suffix_offset(-1) {}
@@ -18,5 +18,21 @@ struct Node {
 };
 
 Node* append_node(Node *node, int label_offset, int label_length);
-void build_suffix_tree_naive(string str, Node *root);
-void query_suffix_tree(Node *root, string original_str, string query_string, vector<int> *matches);
+void build_suffix_tree_naive(std::string str, Node *root);
+void query_suffix_tree(Node *root, std::string original_str, std::string query_string, std::vector<int> *matches);
+
+// class SuffixTree {
+// 	static Node *root;
+
+// 	public:
+// 		static void build(std::string build_string) {
+// 			if (root) {
+// 				delete root;
+// 			}
+// 			root = new Node();
+// 			build_suffix_tree_naive(build_string, root);
+// 		};
+// 		static void query(std::string query_string) {
+// 			printf("%p", root);
+// 		};
+// };

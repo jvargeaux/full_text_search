@@ -13,7 +13,7 @@ size_t step = 0;
 Node* append_node(Node *parent, int suffix_offset, int label_offset, int label_length) {
 	Node* new_node = new Node(label_offset, label_length);
 	new_node->suffix_offset = suffix_offset;
-	new_node->string_ids.push_back(tuple<int, int>{label_offset, label_length});
+	// new_node->string_ids.push_back(tuple<int, int>{label_offset, label_length});
 	parent->children.push_back(new_node);
 	return new_node;
 }
@@ -34,7 +34,7 @@ Node* split_node(Node *parent_node, int match_index, string original_str, int sp
 
 	int parent_length = split_offset - original_node->label_offset;
 	Node* new_node = new Node(original_node->label_offset, parent_length);
-	new_node->string_ids.push_back(tuple<int, int>{original_node->label_offset, original_node->label_length});
+	// new_node->string_ids.push_back(tuple<int, int>{original_node->label_offset, original_node->label_length});
 
 	int child_length = original_node->label_length - parent_length;
 	original_node->label_offset = split_offset;
@@ -124,7 +124,7 @@ void build_suffix_tree_naive(string original_str, Node *root) {
 
 					// Do not walk down to child yet, in case we need to split, which involves rewriting parent's reference to child
 					Node *matched_child_node = current_node->children[match_index];
-					const auto [matched_child_string_id, matched_child_string_offset] = matched_child_node->string_ids[0];
+					// const auto [matched_child_string_id, matched_child_string_offset] = matched_child_node->string_ids[0];
 
 					// Check for matching characters
 					int num_shared_chars = 0;

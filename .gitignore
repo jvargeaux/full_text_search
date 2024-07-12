@@ -1,5 +1,7 @@
 bin
 obj
+graph
+pymodule/build
 
 *.svg
 *.gv
