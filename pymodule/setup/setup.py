@@ -63,11 +63,6 @@ def main():
     dsc.get_config_vars = custom_config_vars
 
     setup(
-        name='suffixtree',
-        version='1.0',
-        description='A description',
-        author="James Vargo",
-        author_email="jamesvargotech@gmail.com",
         ext_modules=[
             Extension(
                 name='suffixtreemodule',

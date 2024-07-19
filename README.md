@@ -11,3 +11,7 @@ Interesting options:
 * Groonga : https://groonga.org
 * PGronnga : https://pgroonga.github.io
 * Kakasi : http://kakasi.namazu.org/index.html.en
+
+
+Unicode emoji search:
+https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-annotations-full/annotations/en/annotations.json

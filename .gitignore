@@ -5,3 +5,4 @@ pymodule/build
 
 *.svg
 *.gv
+*.egg-info

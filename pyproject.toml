@@ -1,0 +1,9 @@
+[project]
+name = "suffixtree"
+version = "0.0.1"
+authors = [
+    { name = "James Vargo", email = "james@ayo.tokyo" }
+]
+
+[tool.distutils.egg_info]
+egg_base = "pymodule/build"
