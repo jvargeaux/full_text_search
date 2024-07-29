@@ -15,3 +15,44 @@ Interesting options:
 
 Unicode emoji search:
 https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-annotations-full/annotations/en/annotations.json
+
+
+## Python Module
+
+### Build
+
+Install the python module which will trigger build scripts.
+```bash
+pip3 install ./pymodule
+```
+
+
+### Test
+
+Check the Python module is working.
+```bash
+python3 pymodule/test.py
+```
+
+Test Output:
+```bash
+0         # result of build(), 0 = no error
+[0, 9]    # result of query(), list of matching indices (int)
+```
+
+
+## Python Usage
+
+```python
+import suffixtree
+
+# Build
+suffixtree.build(build_string="asdf$")
+
+# Query
+matches: list[int] = suffixtree.query(query_string="df")
+print(matches)
+
+# Output
+# [2]
+```

@@ -3,10 +3,11 @@ from pprint import pprint
 
 def main():
     build_string = "greennerdgreen$"
-    result = suffixtree.build(build_string=build_string)
+
+    result: int = suffixtree.build(build_string="greennerdgreen$")
     print(result)
-    # result = suffixtree.query(query_string="een")
-    # print(result)
+    matches: list[int] = suffixtree.query(query_string="gr")
+    print(matches)
 
 if __name__ == '__main__':
     main()

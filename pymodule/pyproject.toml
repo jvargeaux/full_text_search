@@ -6,4 +6,4 @@ authors = [
 ]
 
 [tool.distutils.egg_info]
-egg_base = "pymodule/build"
+egg_base = "build"
