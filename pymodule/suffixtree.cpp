@@ -13,7 +13,7 @@ std::vector<std::string> build_strings;
 
 
 static PyObject *build(PyObject *self, PyObject *args, PyObject *kwargs) {
-	static char *keywords[] = {"build_string", NULL};
+	static char *keywords[] = {"build_strings", NULL};
 
 	PyObject *listObj;
 

@@ -37,7 +37,9 @@ python3 pymodule/test.py
 Test Output:
 ```bash
 0         # result of build(), 0 = no error
-[0, 9]    # result of query(), list of matching indices (int)
+
+[0, 1]    # result of query(), [string_id, string_offset]
+[1, 9]
 ```
 
 
@@ -47,12 +49,12 @@ Test Output:
 import suffixtree
 
 # Build
-suffixtree.build(build_string="asdf$")
+suffixtree.build(build_strings=["green$", "end$"])
 
 # Query
-matches: list[int] = suffixtree.query(query_string="df")
+matches: list[tuple[int, int]] = suffixtree.query(query_string="en")
 print(matches)
 
 # Output
-# [2]
+# [(0, 4), (1, 1)]
 ```
