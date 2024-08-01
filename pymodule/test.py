@@ -1,12 +1,11 @@
 import suffixtree
-from pprint import pprint
 
 def main():
-    build_string = "greennerdgreen$"
+    build_strings = ["green$", "end$"]
 
-    result: int = suffixtree.build(build_string="greennerdgreen$")
+    result: int = suffixtree.build(build_string=build_strings)
     print(result)
-    matches: list[int] = suffixtree.query(query_string="gr")
+    matches: list[tuple[int, int]] = suffixtree.query(query_string="en")
     print(matches)
 
 if __name__ == '__main__':

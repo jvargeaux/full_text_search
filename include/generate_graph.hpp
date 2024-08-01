@@ -5,4 +5,4 @@
 using namespace std;
 
 
-int generate_graph(string str, Node *root, string filename);
+int generate_graph(std::vector<std::string> build_strings, Node *root, string filename);
