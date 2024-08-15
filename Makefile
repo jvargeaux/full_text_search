@@ -14,10 +14,11 @@ SOURCE_DIR := src
 
 # Sources
 CPP_HEADERS := $(wildcard $(INCLUDE_DIR)/*.hpp)
-CPP_SOURCES := $(wildcard $(SOURCE_DIR)/*.cpp)
+CPP_SOURCES := $(filter-out $(SOURCE_DIR)/main.cpp, $(wildcard $(SOURCE_DIR)/*.cpp))
 
 # Objects
 COMPILE_FLAGS := -std=c++17 -Wall -Wunused-parameter -Wunreachable-code -Wextra -Wpedantic -Wconversion -I $(INCLUDE_DIR)
+LINK_FLAGS :=
 CPP_OBJECTS := $(patsubst $(SOURCE_DIR)/%, $(OBJECT_DIR)/%, ${CPP_SOURCES:.cpp=.o})
 
 # Make flags
@@ -26,20 +27,37 @@ CPP_OBJECTS := $(patsubst $(SOURCE_DIR)/%, $(OBJECT_DIR)/%, ${CPP_SOURCES:.cpp=.
 # Default
 app: COMPILE_FLAGS += -O2 -flto
 app: $(BIN_DIR)/$(APP)
+app: LINK_FLAGS += -flto
 debug: COMPILE_FLAGS += -g -Og
 debug: $(BIN_DIR)/$(APP)
 graph: $(BIN_DIR)/generate_graph
+benchmark: COMPILE_FLAGS += -O2 -flto
+benchmark: LINK_FLAGS += -flto
+benchmark: $(BIN_DIR)/$(APP)_benchmark
 
 # Main: binary
-$(BIN_DIR)/$(APP): $(CPP_OBJECTS)
+$(BIN_DIR)/$(APP): $(CPP_OBJECTS) $(OBJECT_DIR)/main.o
 	@echo -e ""
 	@echo -e "\033[1m\033[92m### Building application\033[0m"
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(GRAPH_DIR)
-	$(CC) $(CPP_OBJECTS) -o $@
+	$(CC) $(LINK_FLAGS) $^ -o $@
 
 # Main: objects
-$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(CPP_HEADERS)
+$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/main.cpp $(CPP_HEADERS)
+	@echo -e "\033[92m### Compiling $<\033[0m"
+	@mkdir -p $(OBJECT_DIR)
+	$(CC) -c $(COMPILE_FLAGS) $< -o $@
+
+# Benchmark: binary
+$(BIN_DIR)/$(APP)_benchmark: $(CPP_OBJECTS) $(OBJECT_DIR)/benchmark.o
+	@echo -e ""
+	@echo -e "\033[1m\033[92m### Building application\033[0m"
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(LINK_FLAGS) $^ -o $@
+
+# Benchmark: objects
+$(OBJECT_DIR)/benchmark.o: benchmark/benchmark.cpp $(CPP_HEADERS)
 	@echo -e "\033[92m### Compiling $<\033[0m"
 	@mkdir -p $(OBJECT_DIR)
 	$(CC) -c $(COMPILE_FLAGS) $< -o $@

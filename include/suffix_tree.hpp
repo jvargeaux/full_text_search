@@ -6,21 +6,21 @@
 
 
 struct Node {
-	std::vector<std::tuple<int, int>> offsets;  // [string_id, suffix_offset]
+	std::vector<std::tuple<size_t, size_t>> offsets;  // [string_id, suffix_offset]
 	// string id for label is index 0 of string_info
-	int label_string_id;
-	int label_offset;
-	int label_length;
+	size_t label_string_id;
+	size_t label_offset;
+	size_t label_length;
 	std::vector<Node*> children;
 
-	Node(int _label_offset, int _label_length) :
+	Node(size_t _label_offset, size_t _label_length) :
 		label_offset(_label_offset), label_length(_label_length) {}
 	Node(): label_offset(0), label_length(0) {}
 };
 
-Node* append_node(Node *node, int label_offset, int label_length);
+Node* append_node(Node *node, size_t label_offset, size_t label_length);
 void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root);
-void query_suffix_tree(Node *root, std::vector<std::string> build_strings, std::string query_string, std::vector<std::tuple<int, int>> *matches);
+void query_suffix_tree(Node *root, std::vector<std::string> build_strings, std::string query_string, std::vector<std::tuple<size_t, size_t>> *matches);
 
 // class SuffixTree {
 // 	static Node *root;

@@ -51,7 +51,7 @@ static PyObject *query(PyObject *self, PyObject *args, PyObject *kwargs) {
 		return PyLong_FromLong(0);
 	}
 
-	std::vector<std::tuple<int, int>> matches {};
+	std::vector<std::tuple<size_t, size_t>> matches {};
 	query_suffix_tree(root, build_strings, query_string, &matches);
 
 	PyObject *python_matches = PyList_New(matches.size());
@@ -65,25 +65,42 @@ static PyObject *query(PyObject *self, PyObject *args, PyObject *kwargs) {
 
 static PyObject *benchmark(PyObject *self, PyObject *args, PyObject *kwargs) {
 	// Parse arguments
-	static char *keywords[] = {"build_strings", "query_string", "num_iterations", NULL};
-	PyObject *listObj;
-	std::vector<std::string> benchmark_build_strings;
-	const char *query_string;
-	size_t num_iterations;
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!sk", keywords, &PyList_Type, &listObj, &query_string, &num_iterations)) {
+	static char *keywords[] = {"build_strings", "query_strings", "iterations", NULL};
+	PyObject *build_list;
+	PyObject *query_list;
+	PyObject *iterations_list;
+	std::vector<std::string> build_strings;
+	std::vector<std::string> query_strings;
+	std::vector<size_t> iterations;
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!O!O!", keywords, &PyList_Type, &build_list, &PyList_Type, &query_list, &PyList_Type, &iterations_list)) {
         return NULL;
     }
 
-	// Parse list of strings
-	for (int i = 0; i < PyList_Size(listObj); i++) {
+	// Parse build strings
+	for (size_t i = 0; i < PyList_Size(build_list); i++) {
 		PyObject *item;
-		item = PyList_GetItem(listObj, i);
+		item = PyList_GetItem(build_list, i);
 		PyObject* str = PyUnicode_AsEncodedString(item, "utf-8", "~E~");
 		const char *bytes = PyBytes_AS_STRING(str);
-		benchmark_build_strings.push_back(bytes);
+		build_strings.push_back(bytes);
+	}
+	// Parse query strings
+	for (size_t i = 0; i < PyList_Size(query_list); i++) {
+		PyObject *item;
+		item = PyList_GetItem(query_list, i);
+		PyObject* str = PyUnicode_AsEncodedString(item, "utf-8", "~E~");
+		const char *bytes = PyBytes_AS_STRING(str);
+		query_strings.push_back(bytes);
+	}
+	// Parse iterations
+	for (size_t i = 0; i < PyList_Size(iterations_list); i++) {
+		PyObject *item;
+		item = PyList_GetItem(iterations_list, i);
+		size_t iteration = PyLong_AsSize_t(item);
+		iterations.push_back(iteration);
 	}
 
-	run_benchmark(benchmark_build_strings, query_string, num_iterations);
+	run_benchmark(build_strings, query_strings, iterations);
 
 	return PyLong_FromLong(0);
 };

@@ -10,7 +10,7 @@ using namespace std;
 size_t step = 0;
 
 
-Node* append_node(Node *parent, int string_id, int suffix_offset, int label_offset, int label_length) {
+Node* append_node(Node *parent, size_t string_id, size_t suffix_offset, size_t label_offset, size_t label_length) {
 	Node* new_node = new Node(label_offset, label_length);
 	new_node->label_string_id = string_id;
 	new_node->offsets.push_back({string_id, suffix_offset});
@@ -19,7 +19,7 @@ Node* append_node(Node *parent, int string_id, int suffix_offset, int label_offs
 }
 
 
-Node* split_node(Node *parent_node, int match_index, int string_id, string original_str, int split_offset) {
+Node* split_node(Node *parent_node, size_t match_index, size_t split_offset) {
 	//    (original_offset, original_length)
 	// -> (original_offset, parent_length) + (split_offset, child_length)
 	// 
@@ -32,11 +32,11 @@ Node* split_node(Node *parent_node, int match_index, int string_id, string origi
 
 	Node *original_node = parent_node->children[match_index];
 
-	int parent_length = split_offset - original_node->label_offset;
+	size_t parent_length = split_offset - original_node->label_offset;
 	Node* new_node = new Node(original_node->label_offset, parent_length);
 	new_node->label_string_id = original_node->label_string_id;
 
-	int child_length = original_node->label_length - parent_length;
+	size_t child_length = original_node->label_length - parent_length;
 	original_node->label_offset = split_offset;
 	original_node->label_length = child_length;
 	// original_node->suffix_offset = -1;
@@ -48,14 +48,14 @@ Node* split_node(Node *parent_node, int match_index, int string_id, string origi
 }
 
 
-int matching_child_index(Node *node, std::vector<std::string> build_strings, string query_str, int query_offset) {
+int matching_child_index(Node *node, std::vector<std::string> build_strings, string query_str, size_t query_offset) {
 	// If the first character matches, we have found our match.
 	// Explanation:   There will never be two children who share the same first character,
 	//                as the shared character will have become its own node
 	// possible:    a, ba$
 	// impossible:  a, aba$
 
-	for (int i = 0; i < node->children.size(); i++) {
+	for (size_t i = 0; i < node->children.size(); i++) {
 		if constexpr(debug) {
 			string query_substring = query_str.substr(query_offset, query_str.length());
 			string node_label = build_strings[node->children[i]->label_string_id].substr(node->children[i]->label_offset, node->children[i]->label_length);
@@ -63,14 +63,14 @@ int matching_child_index(Node *node, std::vector<std::string> build_strings, str
 		}
 
 		if (build_strings[node->children[i]->label_string_id][node->children[i]->label_offset] == query_str[query_offset]) {
-			return i;
+			return (int)i;
 		}
 	}
 	return -1;
 }
 
 
-int get_num_shared_chars(Node *node, std::vector<std::string> build_strings, string query_str, int *query_offset) {
+size_t get_num_shared_chars(Node *node, std::vector<std::string> build_strings, string query_str, size_t *query_offset) {
 	// Cut off label_length from beginning of query string
 	// Original:          xyzaba$
 	// Node label:        ab     <-- length of 2
@@ -78,7 +78,7 @@ int get_num_shared_chars(Node *node, std::vector<std::string> build_strings, str
 	//                           -> Move to the right by 2 (match length)
 	// Remaining query:   a$     <-- offset 5
 	
-	int n = 0;
+	size_t n = 0;
 	// Break loop if either string goes out of bounds
 	while (n < node->label_length && *query_offset < query_str.length()) {
 		// cout << "Build string: " << build_strings[node->label_string_id] << '\n';
@@ -100,15 +100,15 @@ void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root)
 	Node *current_node;
 
 	// Loop through all build strings
-	for (int i = 0; i < build_strings.size(); i++) {
+	for (size_t i = 0; i < build_strings.size(); i++) {
 		const std::string original_str = build_strings[i];
 
 		if constexpr(debug) cout << "\nOriginal terminated string: " << original_str << "\n";
 
 		// Loop through all suffixes
-		for (int s = 0; s < original_str.length(); s++) {
+		for (size_t s = 0; s < original_str.length(); s++) {
 			string suffix_label = original_str.substr(s, original_str.length());
-			int current_suffix_offset = s;
+			size_t current_suffix_offset = s;
 			if constexpr(debug) cout << "\n---\noffset: " << s << " | suffix: " << suffix_label << '\n';
 
 			// Start with root
@@ -130,11 +130,11 @@ void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root)
 						if constexpr(debug) cout << "Found match.\n";
 
 						// Do not walk down to child yet, in case we need to split, which involves rewriting parent's reference to child
-						Node *matched_child_node = current_node->children[match_index];
+						Node *matched_child_node = current_node->children[(size_t)match_index];
 						// const auto [matched_child_string_id, matched_child_string_offset] = matched_child_node->string_ids[0];
 
 						// Check for matching characters
-						int num_shared_chars = 0;
+						size_t num_shared_chars = 0;
 						// Break loop if either string goes out of bounds
 						while (num_shared_chars < matched_child_node->label_length && current_suffix_offset < original_str.length()) {
 							if (build_strings[matched_child_node->label_string_id][matched_child_node->label_offset + num_shared_chars] != original_str[current_suffix_offset]) {
@@ -161,8 +161,8 @@ void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root)
 						}
 						// If a partial match, split node
 						else {
-							if constexpr(debug) debug_split_node(matched_child_node, build_strings, current_suffix_offset, matched_child_node->label_offset + num_shared_chars);
-							current_node = split_node(current_node, match_index, i, original_str, matched_child_node->label_offset + num_shared_chars);
+							if constexpr(debug) debug_split_node(matched_child_node, build_strings, matched_child_node->label_offset + num_shared_chars);
+							current_node = split_node(current_node, (size_t)match_index, matched_child_node->label_offset + num_shared_chars);
 							if constexpr(debug) debug_append_node(current_node, build_strings, i, current_suffix_offset);
 							append_node(current_node, i, s, current_suffix_offset, original_str.length() - current_suffix_offset);
 							if constexpr(step_graph) {
@@ -200,22 +200,22 @@ void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root)
 }
 
 
-void find_all_subtree_leaves(Node *node, std::vector<std::string> build_strings, std::vector<std::tuple<int, int>> *matches) {
+void find_all_subtree_leaves(Node *node, std::vector<std::string> build_strings, std::vector<std::tuple<size_t, size_t>> *matches) {
 	if (!node->children.size()) {
-		for (const std::tuple offset : node->offsets) {
+		for (const auto &offset : node->offsets) {
 			matches->push_back(offset);
 		}
 		return;
 	}
-	for (int i = 0; i < node->children.size(); i++) {
+	for (size_t i = 0; i < node->children.size(); i++) {
 		find_all_subtree_leaves(node->children[i], build_strings, matches);
 	}
 }
 
 
-void query_suffix_tree(Node *root, std::vector<std::string> build_strings, string query_string, std::vector<std::tuple<int, int>> *matches) {
+void query_suffix_tree(Node *root, std::vector<std::string> build_strings, string query_string, std::vector<std::tuple<size_t, size_t>> *matches) {
 	Node *current_node = root;
-	int query_offset = 0;
+	size_t query_offset = 0;
 
 	while (query_offset < query_string.length()) {
 		int match_index = matching_child_index(current_node, build_strings, query_string, query_offset);
@@ -226,9 +226,9 @@ void query_suffix_tree(Node *root, std::vector<std::string> build_strings, strin
 			return;
 		}
 		else {
-			Node *matched_child_node = current_node->children[match_index];
+			Node *matched_child_node = current_node->children[(size_t)match_index];
 			
-			int num_shared_chars = get_num_shared_chars(matched_child_node, build_strings, query_string, &query_offset);
+			size_t num_shared_chars = get_num_shared_chars(matched_child_node, build_strings, query_string, &query_offset);
 			if constexpr(debug) cout << "Num shared chars: " << num_shared_chars << '\n';
 			if constexpr(debug) cout << "Query offset: " << query_offset << '\n';
 

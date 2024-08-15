@@ -39,7 +39,7 @@ namespace ArgParser {
 			void print_all_arguments() {
 				std::cout << "\nArguments:\n";
 				std::shared_ptr<Argument> argument_ptr;
-				for (const std::pair<std::string, std::shared_ptr<Argument>> &pair : argument_aliases) {
+				for (const auto &pair : argument_aliases) {
 					if (argument_ptr == pair.second) {
 						std::cout << '\t' << std::setw(20) << std::left << pair.first << '\n';
 					}

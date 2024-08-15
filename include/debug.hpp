@@ -9,7 +9,7 @@ constexpr bool step_graph = false;
 
 
 void debug_node_info(Node *current_node, std::vector<std::string> build_strings);
-void debug_match_child_label(std::vector<std::string> build_strings, int string_id, int current_suffix_offset, int num_shared_chars);
+void debug_match_child_label(std::vector<std::string> build_strings, size_t string_id, size_t current_suffix_offset, size_t num_shared_chars);
 void debug_walk_node(Node *current_node, std::vector<std::string> build_strings);
-void debug_split_node(Node *current_node, std::vector<std::string> build_strings, int current_suffix_offset, int split_offset);
-void debug_append_node(Node *current_node, std::vector<std::string> build_strings, int string_id, int current_suffix_offset);
+void debug_split_node(Node *current_node, std::vector<std::string> build_strings, size_t split_offset);
+void debug_append_node(Node *current_node, std::vector<std::string> build_strings, size_t string_id, size_t current_suffix_offset);
