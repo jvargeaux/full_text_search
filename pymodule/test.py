@@ -17,7 +17,7 @@ def main():
     #         build_strings.append(item['title'] + "$")
     #         build_strings.append(item['description'] + "$")
     
-    query_strings = ["qwerty"]
+    query_strings = ["en", "qwerty"]
     iterations = [10, 1000]
 
     # print("Building suffix tree...")

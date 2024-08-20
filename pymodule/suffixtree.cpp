@@ -100,9 +100,41 @@ static PyObject *benchmark(PyObject *self, PyObject *args, PyObject *kwargs) {
 		iterations.push_back(iteration);
 	}
 
-	run_benchmark(build_strings, query_strings, iterations);
+	BenchmarkResults results = run_benchmark(build_strings, query_strings, iterations);
+	PyObject *python_results = PyDict_New();
 
-	return PyLong_FromLong(0);
+	// Raw Sequential
+	PyObject *raw_iterations = PyDict_New();
+	for (int i = 0; i < results.raw_sequential.size(); i++) {
+		PyObject *iteration_key = Py_BuildValue("i", iterations[i]);
+		PyObject *iteration_results = PyDict_New();
+		for (int s = 0; s < results.raw_sequential[i].times_ms.size(); s++) {
+			PyObject *time_key = Py_BuildValue("s", query_strings[s].c_str());
+			PyObject *time_value = Py_BuildValue("d", results.raw_sequential[i].times_ms[s]);
+			PyDict_SetItem(iteration_results, time_key, time_value);
+		}
+		PyDict_SetItem(raw_iterations, iteration_key, iteration_results);
+	}
+
+	// Suffix Tree
+	PyObject *suffixtree_iterations = PyDict_New();
+	for (int i = 0; i < results.suffix_tree.size(); i++) {
+		PyObject *iteration_key = Py_BuildValue("i", iterations[i]);
+		PyObject *iteration_results = PyDict_New();
+		for (int s = 0; s < results.suffix_tree[i].times_ms.size(); s++) {
+			PyObject *time_key = Py_BuildValue("s", query_strings[s].c_str());
+			PyObject *time_value = Py_BuildValue("d", results.suffix_tree[i].times_ms[s]);
+			PyDict_SetItem(iteration_results, time_key, time_value);
+		}
+		PyDict_SetItem(suffixtree_iterations, iteration_key, iteration_results);
+	}
+
+	PyObject *raw_key = Py_BuildValue("s", "raw_sequential");
+	PyObject *suffixtree_key = Py_BuildValue("s", "suffix_tree");
+	PyDict_SetItem(python_results, raw_key, raw_iterations);
+	PyDict_SetItem(python_results, suffixtree_key, suffixtree_iterations);
+
+	return python_results;
 };
 
 

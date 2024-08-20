@@ -2,6 +2,7 @@ bin
 obj
 graph
 pymodule/build
+.venv
 
 *.svg
 *.gv
