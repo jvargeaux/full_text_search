@@ -48,7 +48,7 @@ Node* split_node(Node *parent_node, size_t match_index, size_t split_offset) {
 }
 
 
-int matching_child_index(Node *node, std::vector<std::string> build_strings, string query_str, size_t query_offset) {
+int matching_child_index(Node *node, const std::vector<std::string>& build_strings, const std::string& query_str, size_t query_offset) {
 	// If the first character matches, we have found our match.
 	// Explanation:   There will never be two children who share the same first character,
 	//                as the shared character will have become its own node
@@ -93,7 +93,7 @@ size_t get_num_shared_chars(Node *node, std::vector<std::string> build_strings, 
 }
 
 
-void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root) {
+void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node *root) {
 	// Internal node: children > 0
 	// Leaf node: children == 0
 
@@ -200,7 +200,7 @@ void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root)
 }
 
 
-void find_all_subtree_leaves(Node *node, std::vector<std::string> build_strings, std::vector<std::tuple<size_t, size_t>> *matches) {
+void find_all_subtree_leaves(Node *node, const std::vector<std::string>& build_strings, std::vector<std::tuple<size_t, size_t>> *matches) {
 	if (!node->children.size()) {
 		for (const auto &offset : node->offsets) {
 			matches->push_back(offset);
@@ -213,7 +213,7 @@ void find_all_subtree_leaves(Node *node, std::vector<std::string> build_strings,
 }
 
 
-void query_suffix_tree(Node *root, std::vector<std::string> build_strings, string query_string, std::vector<std::tuple<size_t, size_t>> *matches) {
+void query_suffix_tree(Node *root, const std::vector<std::string>& build_strings, const std::string& query_string, std::vector<std::tuple<size_t, size_t>> *matches) {
 	Node *current_node = root;
 	size_t query_offset = 0;
 

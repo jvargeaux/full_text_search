@@ -18,9 +18,9 @@ struct Node {
 	Node(): label_offset(0), label_length(0) {}
 };
 
-Node* append_node(Node *node, size_t label_offset, size_t label_length);
-void build_suffix_tree_naive(std::vector<std::string> build_strings, Node *root);
-void query_suffix_tree(Node *root, std::vector<std::string> build_strings, std::string query_string, std::vector<std::tuple<size_t, size_t>> *matches);
+Node* append_node(Node *parent, size_t string_id, size_t suffix_offset, size_t label_offset, size_t label_length);
+void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node *root);
+void query_suffix_tree(Node *root, const std::vector<std::string>& build_strings, const std::string& query_string, std::vector<std::tuple<size_t, size_t>> *matches);
 
 // class SuffixTree {
 // 	static Node *root;

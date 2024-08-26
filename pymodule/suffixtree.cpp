@@ -52,7 +52,7 @@ static PyObject *query(PyObject *self, PyObject *args, PyObject *kwargs) {
 	}
 
 	std::vector<std::tuple<size_t, size_t>> matches {};
-	query_suffix_tree(root, build_strings, query_string, &matches);
+	query_suffix_tree(root, build_strings, (std::string)query_string, &matches);
 
 	PyObject *python_matches = PyList_New(matches.size());
 	for (int i = 0; i < matches.size(); i++) {

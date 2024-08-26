@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "benchmark.hpp"
 #include "generate_graph.hpp"
 #include "suffix_tree.hpp"
@@ -58,28 +59,30 @@ BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_
 
 		// Get matches
 		matches = benchmark_function(data, q);
-		std::chrono::duration<double, std::milli> time_ms = t2 - t1;
-		result.times_ms.push_back(time_ms.count());
+		std::chrono::duration<double, std::milli> time_ms = (t2 - t1);
+		std::chrono::duration<double, std::milli> time_ms_per_iter = (t2 - t1) / num_iterations;
+
+		result.times_ms.push_back(time_ms_per_iter.count());
 
 		// Print results
 		if constexpr(benchmark_oneline) {
-			std::cout << num_iterations << " iterations: \"" << data->query_strings[q] << "\" -> "
-			          << matches.size() << " matches\n"
-			          << time_ms.count() << " ms\n\n";
+			std::cout << "\"" << data->query_strings[q] << "\" (" << matches.size() << " matches): "
+			          << num_iterations << " iterations in " << time_ms.count() << " ms -> "
+					  << time_ms_per_iter.count() << " ms/it\n";
 		}
 		else {
-			std::chrono::duration<double> time = t2 - t1;
-			// auto time_s = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
-			auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-			auto time_us = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
-			auto time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
+			std::chrono::duration<double> time_s_per_iter = (t2 - t1) / num_iterations;
+			auto time_ms_per_iter = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1) / num_iterations;
+			auto time_us_per_iter = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1) / num_iterations;
+			auto time_ns_per_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1) / num_iterations;
 
-			std::cout << num_iterations << " iterations: \"" << data->query_strings[q] << "\" -> "
-			          << matches.size() << " matches\n" << std::right
-			          << "\t" << std::setw(10) << std::fixed << std::setprecision(9) << time.count() << "  s\n"
-			          << "\t" << std::setw(5) << time_ms.count() << "       ms\n"
-			          << "\t" << std::setw(8) << time_us.count() % 1000 << "    μs\n"
-			          << "\t" << std::setw(11) << time_ns.count() % 1000 << " ns\n\n";
+			std::cout << "\"" << data->query_strings[q] << "\" (" << matches.size() << " matches) -> "
+			          << num_iterations << " iterations in " << time_ms.count() << " s\n"
+			          << std::right
+			          << std::setw(10) << std::fixed << std::setprecision(9) << time_s_per_iter.count() << "  s / it\n"
+			          << std::setw(5) << time_ms_per_iter.count() << "       ms / it\n"
+			          << std::setw(8) << time_us_per_iter.count() % 1000 << "    μs / it\n"
+			          << std::setw(11) << time_ns_per_iter.count() % 1000 << " ns / it\n\n";
 		}
 	}
 
@@ -88,12 +91,19 @@ BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_
 
 
 BenchmarkResults run_benchmark(std::vector<std::string> build_strings, std::vector<std::string> query_strings, std::vector<size_t> num_iterations) {
+	size_t suffix_tree_size = 0;
+	for (const std::string& build_string : build_strings) {
+		suffix_tree_size += build_string.size();
+	}
+
 	// Build suffix tree
-	std::cout << "\nBuilding suffix tree (this is the slow part before benchmarking)...\n";
+	// std::cout << "\n\nBuilding suffix tree...\n";
 	Node *root = new Node();
 	build_suffix_tree_naive(build_strings, root);
-	std::cout << "Suffix tree built.\n";
-	std::cout << "Num build strings: " << build_strings.size() << "\n\n";
+	std::cout << "\n\n"
+	          << "-----------------\n"
+	          << "Suffix Tree Size: " << suffix_tree_size << "\n"
+	          << "-----------------\n";
 
 	// Lambda
 	// auto test_fn = []() {}
@@ -106,12 +116,12 @@ BenchmarkResults run_benchmark(std::vector<std::string> build_strings, std::vect
 
 	BenchmarkResults results;
 
-	std::cout << "\nRaw sequential search\n--\n";
+	std::cout << "\nRaw sequential search\n-----\n";
 	for (const size_t& iterations: num_iterations) {
 		results.raw_sequential.push_back(benchmark_function(benchmark_raw_search, &data, iterations));
 	}
 
-	std::cout << "\nSuffix tree\n--\n";
+	std::cout << "\nSuffix tree\n-----\n";
 	for (const size_t& iterations: num_iterations) {
 		results.suffix_tree.push_back(benchmark_function(benchmark_suffix_tree, &data, iterations));
 	}
@@ -126,14 +136,4 @@ int main() {
 	std::vector<size_t> num_iterations = {10, 1000};
 
 	BenchmarkResults results = run_benchmark(build_strings, query_strings, num_iterations);
-	for (const auto &result : results.raw_sequential) {
-		for (const auto &time : result.times_ms) {
-			std::cout << time << '\n';
-		}
-	}
-	for (const auto &result : results.suffix_tree) {
-		for (const auto &time : result.times_ms) {
-			std::cout << time << '\n';
-		}
-	}
 }
