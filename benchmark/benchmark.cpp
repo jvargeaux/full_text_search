@@ -1,6 +1,10 @@
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <functional>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include "benchmark.hpp"
@@ -8,19 +12,19 @@
 #include "suffix_tree.hpp"
 
 
-std::vector<std::tuple<size_t, size_t>> benchmark_raw_search(BenchmarkData *data, size_t query_index) {
+std::vector<std::tuple<size_t, size_t>> benchmark_raw_search(const BenchmarkData& data, size_t query_index) {
 	std::vector<std::tuple<size_t, size_t>> matches {};
-	for (size_t s = 0; s < data->build_strings.size(); s++) {
-		for (size_t i = 0; i < data->build_strings[s].length(); i++) {
+	for (size_t s = 0; s < data.build_strings.size(); s++) {
+		for (size_t i = 0; i < data.build_strings[s].length(); i++) {
 			// If first character doesn't match, move on
-			if (data->build_strings[s][i] != data->query_strings[query_index][0]) {
+			if (data.build_strings[s][i] != data.query_strings[query_index][0]) {
 				continue;
 			}
 			// If first character matches, check length of query string
 			bool match = true;
-			for (size_t j = 0; j < data->query_strings[query_index].length(); j++) {
+			for (size_t j = 0; j < data.query_strings[query_index].length(); j++) {
 				// Break if we go out of bounds or if mismatch
-				if (i + j >= data->build_strings[s].length() || data->build_strings[s][i + j] != data->query_strings[query_index][j]) {
+				if (i + j >= data.build_strings[s].length() || data.build_strings[s][i + j] != data.query_strings[query_index][j]) {
 					match = false;
 					break;
 				}
@@ -34,18 +38,18 @@ std::vector<std::tuple<size_t, size_t>> benchmark_raw_search(BenchmarkData *data
 }
 
 
-std::vector<std::tuple<size_t, size_t>> benchmark_suffix_tree(BenchmarkData *data, size_t query_index) {
+std::vector<std::tuple<size_t, size_t>> benchmark_suffix_tree(const BenchmarkData& data, size_t query_index) {
 	std::vector<std::tuple<size_t, size_t>> matches {};
-	query_suffix_tree(data->root, data->build_strings, data->query_strings[query_index], &matches);
+	query_suffix_tree(data.root, data.build_strings, data.query_strings[query_index], &matches);
 	return matches;
 }
 
 
-BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_t>> (*benchmark_function) (BenchmarkData *data, size_t query_index), BenchmarkData *data, size_t num_iterations) {
+BenchmarkIterationResult run_benchmark_function(std::vector<std::tuple<size_t, size_t>> (*benchmark_function) (const BenchmarkData& data, size_t query_index), const BenchmarkData& data, size_t num_iterations) {
 	std::vector<std::tuple<size_t, size_t>> matches {};
 	BenchmarkIterationResult result;
 
-	for (size_t q = 0; q < data->query_strings.size(); q++) {
+	for (size_t q = 0; q < data.query_strings.size(); q++) {
 		// Start benchmark
 		auto t1 = std::chrono::steady_clock::now();
 
@@ -66,7 +70,7 @@ BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_
 
 		// Print results
 		if constexpr(benchmark_oneline) {
-			std::cout << "\"" << data->query_strings[q] << "\" (" << matches.size() << " matches): "
+			std::cout << "\"" << data.query_strings[q] << "\" (" << matches.size() << " matches): "
 			          << num_iterations << " iterations in " << time_ms.count() << " ms -> "
 					  << time_ms_per_iter.count() << " ms/it\n";
 		}
@@ -76,7 +80,7 @@ BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_
 			auto time_us_per_iter = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1) / num_iterations;
 			auto time_ns_per_iter = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1) / num_iterations;
 
-			std::cout << "\"" << data->query_strings[q] << "\" (" << matches.size() << " matches) -> "
+			std::cout << "\"" << data.query_strings[q] << "\" (" << matches.size() << " matches) -> "
 			          << num_iterations << " iterations in " << time_ms.count() << " s\n"
 			          << std::right
 			          << std::setw(10) << std::fixed << std::setprecision(9) << time_s_per_iter.count() << "  s / it\n"
@@ -90,7 +94,7 @@ BenchmarkIterationResult benchmark_function(std::vector<std::tuple<size_t, size_
 }
 
 
-BenchmarkResults run_benchmark(std::vector<std::string> build_strings, std::vector<std::string> query_strings, std::vector<size_t> num_iterations) {
+BenchmarkResults run_benchmark(const std::vector<std::string>& build_strings, const std::vector<std::string>& query_strings, std::vector<size_t> num_iterations) {
 	size_t suffix_tree_size = 0;
 	for (const std::string& build_string : build_strings) {
 		suffix_tree_size += build_string.size();
@@ -118,15 +122,35 @@ BenchmarkResults run_benchmark(std::vector<std::string> build_strings, std::vect
 
 	std::cout << "\nRaw sequential search\n-----\n";
 	for (const size_t& iterations: num_iterations) {
-		results.raw_sequential.push_back(benchmark_function(benchmark_raw_search, &data, iterations));
+		results.raw_sequential.push_back(run_benchmark_function(benchmark_raw_search, data, iterations));
 	}
 
 	std::cout << "\nSuffix tree\n-----\n";
 	for (const size_t& iterations: num_iterations) {
-		results.suffix_tree.push_back(benchmark_function(benchmark_suffix_tree, &data, iterations));
+		results.suffix_tree.push_back(run_benchmark_function(benchmark_suffix_tree, data, iterations));
 	}
 
 	return results;
+}
+
+
+namespace fs = std::filesystem;
+
+std::tuple<std::vector<std::string>, std::vector<std::string>> load_data(const fs::path& data_path)
+{
+	std::vector<std::string> title_strings;
+	std::vector<std::string> description_strings;
+
+	std::ifstream data_file {data_path};
+	std::string data_line;
+	std::getline(data_file, data_line, '\n'); // Skipping csv header
+	while(std::getline(data_file, data_line, '\n'))
+	{
+		auto separator_index = data_line.find('\t');
+		title_strings.push_back(data_line.substr(0, separator_index) + '$');
+		description_strings.push_back(data_line.substr(separator_index + 1) + '$');
+	}
+	return {title_strings, description_strings};
 }
 
 
@@ -136,4 +160,15 @@ int main() {
 	std::vector<size_t> num_iterations = {10, 1000};
 
 	BenchmarkResults results = run_benchmark(build_strings, query_strings, num_iterations);
+	
+
+	fs::path data_path {"data/random.csv"};
+	if(!fs::exists(data_path))
+	{
+		std::cout << "Cannot find data at " << data_path << std::endl;
+		return 1;
+	}
+	const auto [title_strings, description_strings] = load_data(data_path);
+
+	run_benchmark(description_strings, {"urna", "uran"}, {10000});
 }

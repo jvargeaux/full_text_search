@@ -70,7 +70,7 @@ int matching_child_index(Node *node, const std::vector<std::string>& build_strin
 }
 
 
-size_t get_num_shared_chars(Node *node, std::vector<std::string> build_strings, string query_str, size_t *query_offset) {
+size_t get_num_shared_chars(Node *node, const std::vector<std::string>& build_strings, const std::string& query_str, size_t& query_offset) {
 	// Cut off label_length from beginning of query string
 	// Original:          xyzaba$
 	// Node label:        ab     <-- length of 2
@@ -80,14 +80,14 @@ size_t get_num_shared_chars(Node *node, std::vector<std::string> build_strings, 
 	
 	size_t n = 0;
 	// Break loop if either string goes out of bounds
-	while (n < node->label_length && *query_offset < query_str.length()) {
+	while (n < node->label_length && query_offset < query_str.length()) {
 		// cout << "Build string: " << build_strings[node->label_string_id] << '\n';
 		// cout << "Query string: " << query_str << '\n';
-		if (build_strings[node->label_string_id][node->label_offset + n] != query_str[*query_offset]) {
+		if (build_strings[node->label_string_id][node->label_offset + n] != query_str[query_offset]) {
 			break;
 		}
 		n++;
-		(*query_offset)++;
+		query_offset++;
 	}
 	return n;
 }
@@ -228,7 +228,7 @@ void query_suffix_tree(Node *root, const std::vector<std::string>& build_strings
 		else {
 			Node *matched_child_node = current_node->children[(size_t)match_index];
 			
-			size_t num_shared_chars = get_num_shared_chars(matched_child_node, build_strings, query_string, &query_offset);
+			size_t num_shared_chars = get_num_shared_chars(matched_child_node, build_strings, query_string, query_offset);
 			if constexpr(debug) cout << "Num shared chars: " << num_shared_chars << '\n';
 			if constexpr(debug) cout << "Query offset: " << query_offset << '\n';
 

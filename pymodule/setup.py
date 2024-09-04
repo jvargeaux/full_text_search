@@ -1,9 +1,13 @@
+import os
 from pathlib import Path
 
 import distutils.sysconfig as dsc
 from distutils.sysconfig import get_config_vars as default_get_config_vars
 from setuptools import setup, Extension
 
+
+os.environ["CC"] = "gcc"
+os.environ["CXX"] = "g++"
 
 project_dir = Path(__file__).resolve().parent.parent
 source_paths = [
@@ -56,7 +60,7 @@ def main():
                 sources=[str(source_path) for source_path in source_paths],
                 include_dirs=[str(include_path) for include_path in include_paths],
                 language="c++",
-                extra_compile_args=["-W", "-std=c++17"],
+                extra_compile_args=["-W", "-std=c++17", ""],
             )
         ]
     )

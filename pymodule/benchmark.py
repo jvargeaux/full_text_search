@@ -46,7 +46,7 @@ def main():
     data = [
         # {
         #     'path': Path(project_dir, 'data', 'random.json'),
-        #     'keys': ['title', 'description'],
+        #     'keys': ['description'],
         #     'query_hit': ['urna'],
         #     'query_miss': [],
         # },
@@ -81,7 +81,7 @@ def main():
             'query_miss': ['qwerty', 'xyz']
         }
     ]
-    iterations = [10]
+    iterations = [100]
     for tree in data:
         try:
             tree['build_strings'] = load_build_strings(data_path=tree['path'], keys=tree['keys'])

@@ -21,4 +21,4 @@ struct BenchmarkResults {
 	std::vector<BenchmarkIterationResult> suffix_tree;
 };
 
-BenchmarkResults run_benchmark(std::vector<std::string> build_strings, std::vector<std::string> query_strings, std::vector<size_t> num_iterations);
+BenchmarkResults run_benchmark(const std::vector<std::string>& build_strings, const std::vector<std::string>& query_strings, std::vector<size_t> num_iterations);
