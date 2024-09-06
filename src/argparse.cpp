@@ -15,7 +15,7 @@ void ArgParser::print_help() {
 	          << "\tbuild        Build the suffix tree\n"
 	          << "\tquery        Query the suffix tree\n"
 	          << "Optional Arguments:\n"
-	          << "\t-f, --file   Path to file\n"
+	          << "\t-d, --data   Path to data file\n"
 	          << "\t-h, --help   Show this help message\n"
 	<< std::endl;
 };
@@ -63,7 +63,7 @@ ArgParser::ArgumentsList ArgParser::parse_args(int argc, char** argv) {
 			ArgParser::print_help();
 			exit(EXIT_FAILURE);
 		}
-		if (arg_strings[1] != "-f" && arg_strings[1] != "--file") {
+		if (arg_strings[1] != "-d" && arg_strings[1] != "--data") {
 			std::cerr << "\n\033[91;1mSuffix Tree Error: Invalid optional argument.\033[0m\n";
 			ArgParser::print_help();
 			exit(EXIT_FAILURE);
@@ -78,7 +78,7 @@ ArgParser::ArgumentsList ArgParser::parse_args(int argc, char** argv) {
 	}
 
 	arguments.add_argument({ "function" }, arg_strings[0]);
-	arguments.add_argument({ "-f", "--file" }, (argc > 3 ? arg_strings[2] : std::string("")));
+	arguments.add_argument({ "-d", "--data" }, (argc > 3 ? arg_strings[2] : std::string("")));
 
 	return arguments;
 };

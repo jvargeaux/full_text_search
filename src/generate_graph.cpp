@@ -3,20 +3,22 @@
 #include <string>
 #include <tuple>
 #include "suffix_tree.hpp"
+#include "suffix_tree_ukkonen.hpp"
 using namespace std;
 
 
 size_t id;
 
 
-void print_node_labels(std::vector<std::string> build_strings, Node *node, ofstream *fout) {
+void print_node_labels(const std::vector<std::string>& build_strings, Node *node, ofstream *fout) {
+	bool is_root = node->label_string_id == std::string::npos || node->label_offset == std::string::npos;
 
-	if (node->label_length) id++;
-	string node_label = build_strings[node->label_string_id].substr(node->label_offset, node->label_length);
+	if (node->label_string_id != std::string::npos) id++;
+	string node_label = is_root ? "root" : build_strings[node->label_string_id].substr(node->label_offset, node->label_length);
 
-	*fout << '\t' << (node->label_length ? id : 0)
-	      << " [label=\"" << (node->label_length ? node_label : "root")
-		  << "\n[" << node->label_string_id << "," << node->label_offset << "," << node->label_length << "]";
+	*fout << '\t' << (is_root ? 0 : id)
+	      << " [label=\"" << node_label
+		  << "\n[" << (int)node->label_string_id << "," << (int)node->label_offset << "," << (int)node->label_length << "]";
 	for (size_t i = 0; i < node->offsets.size(); i++) {
 		size_t string_id = std::get<0>(node->offsets[i]);
 		size_t string_offset = std::get<1>(node->offsets[i]);
@@ -33,7 +35,7 @@ void print_node_labels(std::vector<std::string> build_strings, Node *node, ofstr
 }
 
 
-void print_connections(std::vector<std::string> build_strings, Node *node, ofstream *fout) {
+void print_connections(const std::vector<std::string>& build_strings, Node *node, ofstream *fout) {
 	if (node->children.empty()) {
 		return;
 	}
@@ -47,7 +49,7 @@ void print_connections(std::vector<std::string> build_strings, Node *node, ofstr
 }
 
 
-void generate_graph(std::vector<std::string> build_strings, Node *root, string filename = "graph/graph.gv") {
+void generate_graph(const std::vector<std::string>& build_strings, Node *root, string filename = "graph/graph.gv") {
 	ofstream fout(filename);
 
 	fout << "digraph {\n";

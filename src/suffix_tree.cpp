@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,12 +8,46 @@
 using namespace std;
 
 
-size_t step = 0;
+std::vector<ParsedData> parse_data(const std::filesystem::path& data_path, char separator_char)
+{
+	std::ifstream data_file {data_path};
+	std::vector<ParsedData> data;
+	std::string line_buffer;
+
+	// Parse keys from csv headers
+	std::getline(data_file, line_buffer, '\n');
+	auto index = line_buffer.find(separator_char);
+	while (index != std::string::npos) {
+		ParsedData _data;
+		_data.key = line_buffer.substr(0, index);
+		data.push_back(_data);
+		line_buffer = line_buffer.substr(index + 1);
+		index = line_buffer.find(separator_char);
+	}
+	ParsedData _data;
+	_data.key = line_buffer;
+	data.push_back(_data);
+
+	// Parse data line by line
+	size_t n;
+	while(std::getline(data_file, line_buffer, '\n')) {
+		n = 0;
+		index = line_buffer.find(separator_char);
+		while (index != std::string::npos) {
+			data[n].data.push_back(line_buffer.substr(0, index));
+			n++;
+			line_buffer = line_buffer.substr(index + 1);
+			index = line_buffer.find(separator_char);
+		}
+		data[n].data.push_back(line_buffer.substr(0, index));
+	}
+
+	return data;
+}
 
 
 Node* append_node(Node *parent, size_t string_id, size_t suffix_offset, size_t label_offset, size_t label_length) {
-	Node* new_node = new Node(label_offset, label_length);
-	new_node->label_string_id = string_id;
+	Node* new_node = new Node(string_id, label_offset, label_length);
 	new_node->offsets.push_back({string_id, suffix_offset});
 	parent->children.push_back(new_node);
 	return new_node;
@@ -33,13 +68,11 @@ Node* split_node(Node *parent_node, size_t match_index, size_t split_offset) {
 	Node *original_node = parent_node->children[match_index];
 
 	size_t parent_length = split_offset - original_node->label_offset;
-	Node* new_node = new Node(original_node->label_offset, parent_length);
-	new_node->label_string_id = original_node->label_string_id;
+	Node* new_node = new Node(original_node->label_string_id, original_node->label_offset, parent_length);
 
 	size_t child_length = original_node->label_length - parent_length;
 	original_node->label_offset = split_offset;
 	original_node->label_length = child_length;
-	// original_node->suffix_offset = -1;
 
 	new_node->children.push_back(original_node);
 	parent_node->children[match_index] = new_node;
@@ -98,6 +131,7 @@ void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node
 	// Leaf node: children == 0
 
 	Node *current_node;
+	size_t step = 0;
 
 	// Loop through all build strings
 	for (size_t i = 0; i < build_strings.size(); i++) {
@@ -166,7 +200,7 @@ void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node
 							if constexpr(debug) debug_append_node(current_node, build_strings, i, current_suffix_offset);
 							append_node(current_node, i, s, current_suffix_offset, original_str.length() - current_suffix_offset);
 							if constexpr(step_graph) {
-								generate_graph(build_strings, root, "graph/debug/gv/step_" + to_string(step) + ".gv");
+								generate_graph(build_strings, root, "graph/debug/step_" + to_string(step) + ".gv");
 								step++;
 							}
 							break;
@@ -178,7 +212,7 @@ void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node
 						if constexpr(debug) debug_append_node(current_node, build_strings, i, current_suffix_offset);
 						append_node(current_node, i, s, current_suffix_offset, original_str.length() - current_suffix_offset);
 						if constexpr(step_graph) {
-							generate_graph(build_strings, root, "graph/debug/gv/step_" + to_string(step) + ".gv");
+							generate_graph(build_strings, root, "graph/debug/step_" + to_string(step) + ".gv");
 							step++;
 						}
 						break;
@@ -189,7 +223,7 @@ void build_suffix_tree_naive(const std::vector<std::string>& build_strings, Node
 					if constexpr(debug) debug_append_node(current_node, build_strings, i, current_suffix_offset);
 					append_node(current_node, i, s, current_suffix_offset, original_str.length() - current_suffix_offset);
 					if constexpr(step_graph) {
-						generate_graph(build_strings, root, "graph/debug/gv/step_" + to_string(step) + ".gv");
+						generate_graph(build_strings, root, "graph/debug/step_" + to_string(step) + ".gv");
 						step++;
 					}
 					break;

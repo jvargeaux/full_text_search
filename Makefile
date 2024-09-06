@@ -30,6 +30,8 @@ app: $(BIN_DIR)/$(APP)
 app: LINK_FLAGS += -flto
 debug: COMPILE_FLAGS += -g -Og
 debug: $(BIN_DIR)/$(APP)
+	@mkdir -p $(GRAPH_DIR)/debug
+	@rm -rf $(GRAPH_DIR)/debug/*
 graph: $(BIN_DIR)/generate_graph
 benchmark: COMPILE_FLAGS += -O2 -flto
 benchmark: LINK_FLAGS += -flto
