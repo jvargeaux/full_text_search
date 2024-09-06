@@ -13,9 +13,6 @@ Interesting options:
 * Kakasi : http://kakasi.namazu.org/index.html.en
 
 
-Unicode emoji search:
-https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-annotations-full/annotations/en/annotations.json
-
 
 ## Python Module
 
@@ -58,3 +55,10 @@ print(matches)
 # Output
 # [(0, 4), (1, 1)]
 ```
+
+
+
+## Resources
+
+- [Ukkonen Algorithm Visualizer](https://brenden.github.io/ukkonen-animation/)
+- [Unicode Emoji Search](https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-annotations-full/annotations/en/annotations.json)
