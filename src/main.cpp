@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Test string
-	std::string test_string = "cancann";
+	std::string test_string = "efeffef";
 	test_string.push_back(terminating_char);
 	build_strings = {test_string};
 
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 	std::cout << "Building suffix tree...\n";
 	// build_suffix_tree_naive(build_strings, root);
 	// generate_graph(build_strings, root, "graph.gv");
-	build_suffix_tree_ukkonen(build_strings, root);
+	build_suffix_tree_ukkonen_refactor(build_strings, root);
 	std::cout << "Done.\n";
 
 	// Query suffix tree

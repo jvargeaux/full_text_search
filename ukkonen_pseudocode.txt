@@ -1,0 +1,95 @@
+
+
+init temp stack:
+	active node = root
+	active child = null
+	active length = 0
+	remainder = 0
+	current suffix offset = 0
+
+
+
+while there is remainder:
+    
+	if inside a label:
+		look for next character
+
+		if no match:
+			SPLIT_NODE at mismatch point
+			APPEND_NODE at new parent
+			decrement remainder
+			RESTART_SEARCH from root
+
+		if match:
+			increment remainder
+			increment active length
+			if end of label:
+				SET_ACTIVE_NODE to here
+			GO_NEXT
+
+	if at a node:
+		look for child with matching first character
+
+		if no child:
+			APPEND_NODE here
+			decrement remainder
+			reset to root
+			GO_NEXT
+
+		if child:
+			find number of matching characters up to remainder (we look for last character, plus any previous from temp stack)
+
+			if no match at any point:
+				SPLIT_NODE at mismatch point
+				APPEND_NODE at new parent
+				decrement remainder
+				RESTART_SEARCH from root
+
+			if we match entire label:
+				SET_ACTIVE_NODE to here
+				RESTART_SEARCH (do not increment end or remainder)
+
+			if we match entire remainder (end inside the label):
+				set active child and active length to mark this spot
+				increment remainder
+				GO_NEXT
+				
+
+
+
+
+SPLIT_NODE:
+	start    split    length
+	|_________| |_______|
+	  parent      child
+
+	create new node, this will be new parent
+	new parent label offset = start
+	new parent label length = split - start
+
+	old child label offset = split
+	old child label length = if has length : length - split | else : null (moves with end)
+
+	attach old child to new parent
+
+	add suffix link from last created node to new parent
+
+
+RESTART_SEARCH:
+	active node = root
+	active child = null
+	active length = 0
+	current suffix offset = 0
+	continue next loop iteration
+
+
+GO_NEXT:
+	increment end
+	continue next loop iteration
+
+
+SET_ACTIVE_NODE:
+	active node = here
+	active child = null
+	active length = 0
+
