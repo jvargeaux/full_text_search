@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <tuple>
 #include "suffix_tree.hpp"
+#include "suffix_tree_ukkonen.hpp"
 #include "benchmark.hpp"
 
 
@@ -33,7 +34,7 @@ static PyObject *build(PyObject *self, PyObject *args, PyObject *kwargs) {
 		build_strings.push_back(bytes);
 	}
 
-	build_suffix_tree_naive(build_strings, root);
+	build_suffix_tree_ukkonen(build_strings, root);
 
 	return PyLong_FromLong(0);
 };
@@ -43,6 +44,7 @@ static PyObject *query(PyObject *self, PyObject *args, PyObject *kwargs) {
 	// Parse arguments
 	static char *keywords[] = {"query_string", NULL};
 	const char *query_string;
+	size_t min_substring_length = 3;
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s", keywords, &query_string)) {
         return NULL;
     }
@@ -51,12 +53,15 @@ static PyObject *query(PyObject *self, PyObject *args, PyObject *kwargs) {
 		return PyLong_FromLong(0);
 	}
 
-	std::vector<std::tuple<size_t, size_t>> matches {};
-	query_suffix_tree(root, build_strings, (std::string)query_string, &matches);
+	// std::vector<std::tuple<size_t, size_t>> matches {};
+	// query_suffix_tree(root, build_strings, (std::string)query_string, &matches);
+	std::vector<Match> matches {};
+	fuzzy_query_suffix_tree_ukkonen(root, build_strings, (std::string)query_string, matches, min_substring_length);
 
 	PyObject *python_matches = PyList_New(matches.size());
 	for (int i = 0; i < matches.size(); i++) {
-		PyObject *match_value = Py_BuildValue("(i,i)", std::get<0>(matches[i]), std::get<1>(matches[i]));
+		// PyObject *match_value = Py_BuildValue("(i,i)", std::get<0>(matches[i]), std::get<1>(matches[i]));
+		PyObject *match_value = Py_BuildValue("(i,i,i)", matches[i].string_id, matches[i].offset, matches[i].length);
 		PyList_SetItem(python_matches, i, match_value);
 	}
 	return python_matches;

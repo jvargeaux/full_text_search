@@ -12,6 +12,7 @@ os.environ["CXX"] = "g++"
 project_dir = Path(__file__).resolve().parent.parent
 source_paths = [
     Path(project_dir, 'src', 'suffix_tree.cpp'),
+    Path(project_dir, 'src', 'suffix_tree_ukkonen.cpp'),
     Path(project_dir, 'benchmark', 'benchmark.cpp'),
     Path(project_dir, 'pymodule', 'suffixtree.cpp')
 ]

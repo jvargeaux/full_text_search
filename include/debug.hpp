@@ -4,7 +4,7 @@
 #include <string>
 #include "suffix_tree.hpp"
 
-constexpr bool debug = true;
+constexpr bool debug = false;
 constexpr bool step_graph = false;
 
 

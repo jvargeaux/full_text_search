@@ -106,7 +106,7 @@ void build_suffix_tree_ukkonen(const std::vector<std::string>& build_strings, No
 		// Temp stack
 		Node *active_node = root;
 		Node *last_created_node = NULL;
-		size_t active_child = std::string::npos;  // active_offset
+		size_t active_child = std::string::npos;
 		size_t active_length = 0;
 		size_t remainder = 0;
 		size_t current_suffix_offset = 0;
@@ -114,6 +114,9 @@ void build_suffix_tree_ukkonen(const std::vector<std::string>& build_strings, No
 
 		size_t end = 0;
 		remainder++;
+
+		// std::cout << "query string length: " << current_build_string.length() << "\n\n";
+		// std::cout << "query string: " << current_build_string << "\n\n";
 
 		while (remainder > 0) {
 
@@ -124,9 +127,14 @@ void build_suffix_tree_ukkonen(const std::vector<std::string>& build_strings, No
 			if constexpr(debug) generate_graph(current_build_strings, root, "graph/debug/step_" + to_string(step) + ".gv");
 
 			// Debug
-			// size_t active_node_label_length = active_node->label_length != std::string::npos ? active_node->label_length : (end - active_node->label_offset);
-			// const std::string& active_node_label = active_node->label_string_id == std::string::npos ? "root" :
-			// 	build_strings[active_node->label_string_id].substr(active_node->label_offset, active_node_label_length);
+			size_t active_node_label_length = active_node->label_length != std::string::npos ? active_node->label_length : (end - active_node->label_offset);
+			// std::cout << active_node->label_string_id << "\n";
+			// std::cout << active_node->label_offset << "\n";
+			// std::cout << active_node->label_length << "\n";
+			// std::cout << active_node_label_length << "\n";
+			// std::cout << build_strings[active_node->label_string_id].length() << "\n";
+			// const std::string& active_node_label = (active_node->label_string_id == std::string::npos || active_node->label_offset) ?
+			// 	"root" : build_strings[active_node->label_string_id].substr(active_node->label_offset, active_node_label_length);
 			// std::cout << "Start Step " << step << "  |  end: " << current_build_string[end] << "(" << end << ")  active_node: " << active_node_label << "  active_child: " << (int)active_child << "  active_length: " << active_length << "  current suffix offset: " << current_suffix_offset << "  remainder: " << remainder << '\n';
 			
 			// Inside label
