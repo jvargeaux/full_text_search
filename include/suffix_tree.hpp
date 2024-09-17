@@ -20,8 +20,8 @@ struct Node {
 	std::vector<Node*> children;
 	Node* suffix_link;
 
-	Node(size_t _label_id, size_t _label_offset, size_t _label_length) :
-		label_string_id(_label_id), label_offset(_label_offset), label_length(_label_length) {}
+	Node(size_t _label_string_id, size_t _label_offset, size_t _label_length) :
+		label_string_id(_label_string_id), label_offset(_label_offset), label_length(_label_length) {}
 	Node(): label_string_id(std::string::npos), label_offset(std::string::npos), label_length(std::string::npos) {}
 };
 

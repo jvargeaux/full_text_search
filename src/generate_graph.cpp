@@ -24,6 +24,11 @@ void print_node_labels(const std::vector<std::string>& build_strings, Node *node
 		size_t string_offset = std::get<1>(node->offsets[i]);
 		*fout << " (" << string_id << "," << string_offset << ")";
 	}
+	if (node->suffix_link) {
+		size_t suffix_link_label_length = node->suffix_link->label_length != std::string::npos ? node->suffix_link->label_length : 0;
+		string suffix_link_label = node->suffix_link->label_string_id == std::string::npos ? "root" : build_strings[node->suffix_link->label_string_id].substr(node->suffix_link->label_offset, suffix_link_label_length);
+		*fout << " {" << suffix_link_label << "}";
+	}
 	*fout << "\"]\n";
 
 	if (node->children.empty()) {

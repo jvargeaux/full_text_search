@@ -34,7 +34,8 @@ int main(int argc, char **argv) {
 	}
 
 	// Test string
-	std::string test_string = "efeffef";
+	std::string test_string = "tiringfiringeth";
+	// std::string test_string = "fireman hired a firep";
 	test_string.push_back(terminating_char);
 	build_strings = {test_string};
 
@@ -43,19 +44,20 @@ int main(int argc, char **argv) {
 	std::cout << "Building suffix tree...\n";
 	// build_suffix_tree_naive(build_strings, root);
 	// generate_graph(build_strings, root, "graph.gv");
-	build_suffix_tree_ukkonen_refactor(build_strings, root);
+	build_suffix_tree_ukkonen(build_strings, root);
 	std::cout << "Done.\n";
 
 	// Query suffix tree
-	std::string query_string = "nn";
-	std::vector<std::tuple<size_t, size_t>> matches {};
-	query_suffix_tree_ukkonen(root, build_strings, query_string, &matches);
+	std::string query_string = "thing";
+	std::vector<Match> matches {};
+	// query_suffix_tree_ukkonen(root, build_strings, query_string, matches);
+	fuzzy_query_suffix_tree_ukkonen(root, build_strings, query_string, matches, 2);
 
-	// Print results
+	// // Print results
+	std::cout << "\nRESULTS\n";
 	for (const auto &match : matches) {
-		size_t string_id = std::get<0>(match);
-		size_t string_offset = std::get<1>(match);
-		std::cout << "[" << string_id << ", " << string_offset << "]\n";
+		string substring = build_strings[match.string_id].substr(match.offset, match.length);
+		std::cout << "\"" << substring << "\": [" << match.string_id << ", " << match.offset << ", " << match.length << "]\n";
 	}
 
 	return 0;
